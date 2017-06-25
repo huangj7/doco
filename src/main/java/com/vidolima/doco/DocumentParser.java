@@ -1,6 +1,7 @@
 package com.vidolima.doco;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -144,8 +145,10 @@ final class DocumentParser {
     }
 
     /**
-     * Obtains a {@link com.google.appengine.api.search.Field} given a name, value and type.
-     * 
+     * Obtains a List of {@link com.google.appengine.api.search.Field} given a name, value and type.
+     * Note by James Huang: Modified to return a list of fields
+     * 						if the field is instanceof Collection.class the List will have more than 1 field,
+     * 						otherwise the List of fields will only have 1 field
      * @param fieldValue
      *            the value to be set to the returned field
      * @param name
@@ -157,27 +160,83 @@ final class DocumentParser {
      * @return the {@link com.google.appengine.api.search.Field}
      * @throws IllegalAccessException
      */
-    private com.google.appengine.api.search.Field getSearchFieldByFieldType(String name, java.lang.reflect.Field field,
+    private List<com.google.appengine.api.search.Field> getSearchFieldByFieldType(String name, java.lang.reflect.Field field,
         Object obj, FieldType fieldType) throws IllegalAccessException {
 
-        Object fieldValue = field.get(obj);
-
+    	List<com.google.appengine.api.search.Field> fieldsToReturn = new ArrayList<>();
+    	
+        Object fieldValue = field.get(obj); // gets the value of field from obj
+        
         if (FieldType.TEXT.equals(fieldType)) {
-            String text = String.valueOf(fieldValue);
-            return Field.newBuilder().setName(name).setText(text).build();
+        	//Check if the fieldValue is a Collection
+        	//if it is add each item in the Collection as a separate field with the same name but different value
+        	if( fieldValue instanceof Collection ){
+        		Collection col = (Collection) fieldValue;
+        		while( col.iterator().hasNext() ){
+        			Object text = col.iterator().next();
+        			if( text instanceof String){ // multi-value fields can only be Strings, not Date of Number
+        				fieldsToReturn.add( Field.newBuilder().setName(name).setText(text).build() );
+        			}
+        			else{
+//        				logger.warn("getSearchFieldByFieldType(), fieldValue is instanceof List but is not List<String>:" + fieldValue );
+        				throw new IllegalArgumentException("getSearchFieldByFieldType(), fieldValue is instanceof List but is not List<String>:" + fieldValue);
+        			}
+        			
+        		}
+        	}
+        	else{
+        		String text = String.valueOf(fieldValue);
+        		fieldsToReturn.add( Field.newBuilder().setName(name).setText(text).build() );
+        	}
+            
         }
-        if (FieldType.HTML.equals(fieldType)) {
-            String html = String.valueOf(fieldValue);
-            return Field.newBuilder().setName(name).setHTML(html).build();
+        if ( FieldType.HTML.equals(fieldType)) {
+        	//Check if the fieldValue is a Collection
+        	//if it is add each item in the Collection as a separate field with the same name but different value
+        	if( fieldValue instanceof Collection ){
+        		Collection col = (Collection) fieldValue;
+        		while( col.iterator().hasNext() ){
+        			Object html = col.iterator().next();
+        			if( html instanceof String){ // multi-value fields can only be Strings not Date of Number
+        				fieldsToReturn.add( Field.newBuilder().setName(name).setHTML(html).build() );
+        			}
+        			else{
+//        				logger.warn("getSearchFieldByFieldType(), fieldValue is instanceof List but is not List<String>:" + fieldValue );
+        				throw new IllegalArgumentException("getSearchFieldByFieldType(), fieldValue is instanceof List but is not List<String>:" + fieldValue);
+        			}
+        		}
+        	}
+        	else{
+	            String html = String.valueOf(fieldValue);
+	            fieldsToReturn.add( Field.newBuilder().setName(name).setHTML(html).build() );
+        	}
         }
         if (FieldType.ATOM.equals(fieldType)) {
-            String atom = String.valueOf(fieldValue);
-            return Field.newBuilder().setName(name).setAtom(atom).build();
+        	
+        	if( fieldValue instanceof Collection ){
+        		Collection col = (Collection) fieldValue;
+        		while( col.iterator().hasNext() ){
+        			Object atom = col.iterator().next();
+        			if( atom instanceof String){ // multi-value fields can only be Strings not Date or Number
+        				fieldsToReturn.add( Field.newBuilder().setName(name).setAtom(atom).build() );
+        			}
+        			else{
+//        				logger.warn("getSearchFieldByFieldType(), fieldValue is instanceof List but is not List<String>:" + fieldValue );
+        				throw new IllegalArgumentException("getSearchFieldByFieldType(), fieldValue is instanceof List but is not List<String>:" + fieldValue);
+        			}
+        			
+        		}
+        	}
+        	else{
+        		String atom = String.valueOf(fieldValue);
+        		fieldsToReturn.add( Field.newBuilder().setName(name).setAtom(atom).build() );
+        	}
+            
         }
         if (FieldType.DATE.equals(fieldType)) {
             if (fieldValue != null) {
                 Date date = (Date) fieldValue;
-                return Field.newBuilder().setName(name).setDate(date).build();
+                fieldsToReturn.add( Field.newBuilder().setName(name).setDate(date).build() );
             }
         }
         if (FieldType.GEO_POINT.equals(fieldType)) {
@@ -185,15 +244,15 @@ final class DocumentParser {
                 if (fieldValue instanceof GeoPt) {
                     GeoPt geoPt = (GeoPt) fieldValue;
                     GeoPoint geoPoint = new GeoPoint(geoPt.getLatitude(), geoPt.getLongitude());
-                    return Field.newBuilder().setName(name).setGeoPoint(geoPoint).build();
+                    fieldsToReturn.add( Field.newBuilder().setName(name).setGeoPoint(geoPoint).build() );
                 } else {
                     GeoPoint geoPoint = (GeoPoint) fieldValue;
-                    return Field.newBuilder().setName(name).setGeoPoint(geoPoint).build();
+                    fieldsToReturn.add( Field.newBuilder().setName(name).setGeoPoint(geoPoint).build() );
                 }
             }
         }
         if (FieldType.NUMBER.equals(fieldType))
-            return getSearchNumberField(name, field, fieldValue);
+        	fieldsToReturn.add( getSearchNumberField(name, field, fieldValue) );
 
         // Note: When you create a document you must specify all of its
         // attributes using the Document.Builder class method. You cannot add,
@@ -201,7 +260,7 @@ final class DocumentParser {
         // attribute once the document has been created. Date and geopoint
         // fields must be assigned a non-null value. Atom, text, HTML, and
         // number fields can be empty
-        return null;
+        return fieldsToReturn; // return null;
     }
 
     /**
@@ -228,10 +287,15 @@ final class DocumentParser {
             if (annotation.type().equals(fieldType)) {
                 String name = ObjectParser.getFieldNameValue(f, annotation);
                 String fullName = Strings.isNullOrEmpty(fieldNamePrefix) ? name : fieldNamePrefix + "_" + name;
-                com.google.appengine.api.search.Field field = getSearchFieldByFieldType(fullName, f, obj, fieldType);
-                if (field != null) {
-                    fields.add(field);
+                //Gets all the Search Fields from the object field
+                //if the object field is a Collection(i.e. a List) we have to store it as a multi-valued field
+                List<com.google.appengine.api.search.Field> searchFields = getSearchFieldByFieldType(fullName, f, obj, fieldType);
+                for( com.google.appengine.api.search.Field field: searchFields){
+                	if (field != null) {
+                        fields.add(field);
+                    }
                 }
+                
             }
         }
 

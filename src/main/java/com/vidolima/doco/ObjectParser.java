@@ -1,7 +1,11 @@
 package com.vidolima.doco;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.google.appengine.api.search.Document;
 import com.google.appengine.api.search.Index;
@@ -130,32 +134,64 @@ final class ObjectParser {
      * @return the value of the field
      */
     private Object getDocumentFieldValue(Document document, java.lang.reflect.Field field) {
-
+    	
         DocumentField annotation = getDocumentFieldAnnotation(field);
-        String fieldName = getFieldNameValue(field, annotation);
+        String fieldName = getFieldNameValue(field, annotation); // gets the fieldName from the annotation incase the Search.Field fieldName is not the default java.lang.reflec.Field name
 
         if (document.getFieldCount(fieldName) == 0)
             return null;
-
-        com.google.appengine.api.search.Field f = document.getOnlyField(fieldName);
-
-        switch (f.getType()) {
-        case TEXT:
-            return f.getText();
-        case ATOM:
-            return f.getAtom();
-        case HTML:
-            return f.getHTML();
-        case DATE:
-            return f.getDate();
-        case NUMBER:
-            return getDocumentFieldNumberValue(document, field, fieldName);
-        case GEO_POINT:
-            return f.getGeoPoint();
+        else if( document.getFieldCount(fieldName) == 1){
+	        com.google.appengine.api.search.Field f = document.getOnlyField(fieldName); // if we want to support multi-valued field 
+	
+	        switch (f.getType()) {
+	        case TEXT:
+	            return f.getText();
+	        case ATOM:
+	            return f.getAtom();
+	        case HTML:
+	            return f.getHTML();
+	        case DATE:
+	            return f.getDate();
+	        case NUMBER:
+	            return getDocumentFieldNumberValue(document, field, fieldName);
+	        case GEO_POINT:
+	            return f.getGeoPoint();
+	        }
+        }
+        else if( document.getFieldCount(fieldName) > 1){ //if it is a multi-valued field
+        	Object collection = null;
+        	
+        	if( Collection.class.isAssignableFrom( field.getType() ) ){ //Check if java.lang.reflect.field is a Set or of List
+        		collection = field.getType().newInstance();
+    		}
+        	else{
+        		throw new IllegalArgumentException("multi-valued field must be of type Collection" ); 
+        	}
+        	
+        	//for every com.google.appengine.api.search.Field
+        	for( com.google.appengine.api.search.Field f: document.getFields(fieldName) ){
+        		
+        		switch (f.getType()) {
+    	        case TEXT:
+    	            ( (Collection) collection).add( f.getText());
+    	            break;
+    	        case ATOM:
+    	        	( (Collection) collection).add( f.getAtom());
+    	            break;
+    	        case HTML:
+    	        	( (Collection) collection).add( f.getHTML());
+    	            break;
+    	        default:
+    	        	throw new IllegalArgumentException("multi-valued field can only be TEXT, ATOM, or HTML, actual type of search field f:" + f.getType() );
+    	        	break;
+    	        }
+        		
+        	}
+        	
+        	return collection;
         }
 
-        throw new IllegalAnnotationDeclarationException("Invalid com.google.appengine.api.search.Field.FieldType: "
-            + f.getType());
+        throw new IllegalAnnotationDeclarationException("Invalid com.google.appengine.api.search.Field.FieldType: " + f.getType());
     }
 
     /**

@@ -175,7 +175,7 @@ final class DocumentParser {
         		while( col.iterator().hasNext() ){
         			Object text = col.iterator().next();
         			if( text instanceof String){ // multi-value fields can only be Strings, not Date of Number
-        				fieldsToReturn.add( Field.newBuilder().setName(name).setText(text).build() );
+        				fieldsToReturn.add( Field.newBuilder().setName(name).setText(text).build() ); // we know text is a String so we can add it to the collection
         			}
         			else{
 //        				logger.warn("getSearchFieldByFieldType(), fieldValue is instanceof List but is not List<String>:" + fieldValue );

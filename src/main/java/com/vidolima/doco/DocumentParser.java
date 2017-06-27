@@ -174,8 +174,9 @@ final class DocumentParser {
         	if( fieldValue instanceof Collection ){
         		
 				Collection col = (Collection) fieldValue;
-        		while( col.iterator().hasNext() ){
-        			Object text = col.iterator().next();
+				Iterator colIterator = col.iterator();
+        		while( colIterator.hasNext() ){
+        			Object text = colIterator.next();
         			if( text instanceof String){ // multi-value fields can only be Strings, not Date of Number
         				fieldsToReturn.add( Field.newBuilder().setName(name).setText((String) text).build() ); // we know text is a String so we can add it to the collection
         			}
@@ -197,8 +198,9 @@ final class DocumentParser {
         	//if it is add each item in the Collection as a separate field with the same name but different value
         	if( fieldValue instanceof Collection ){
         		Collection col = (Collection) fieldValue;
-        		while( col.iterator().hasNext() ){
-        			Object html = col.iterator().next();
+        		Iterator colIterator = col.iterator();
+        		while( colIterator.hasNext() ){
+        			Object html = colIterator.next();
         			if( html instanceof String){ // multi-value fields can only be Strings not Date of Number
         				fieldsToReturn.add( Field.newBuilder().setName(name).setHTML( (String) html).build() );
         			}
@@ -217,8 +219,9 @@ final class DocumentParser {
         	
         	if( fieldValue instanceof Collection ){
         		Collection col = (Collection) fieldValue;
-        		while( col.iterator().hasNext() ){
-        			Object atom = col.iterator().next();
+        		Iterator colIterator = col.iterator();
+        		while( colIterator.hasNext() ){
+        			Object atom = colIterator.next();
         			if( atom instanceof String){ // multi-value fields can only be Strings not Date or Number
         				fieldsToReturn.add( Field.newBuilder().setName(name).setAtom( (String) atom).build() );
         			}

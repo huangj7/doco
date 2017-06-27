@@ -1,11 +1,8 @@
 package com.vidolima.doco;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.google.appengine.api.search.Document;
 import com.google.appengine.api.search.Index;

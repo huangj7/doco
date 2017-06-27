@@ -162,7 +162,8 @@ final class DocumentParser {
      * @return the  List<{@link com.google.appengine.api.search.Field}>
      * @throws IllegalAccessException
      */
-    private List<com.google.appengine.api.search.Field> getSearchFieldByFieldType(String name, java.lang.reflect.Field field,
+    @SuppressWarnings("rawtypes")
+	private List<com.google.appengine.api.search.Field> getSearchFieldByFieldType(String name, java.lang.reflect.Field field,
         Object obj, FieldType fieldType) throws IllegalAccessException {
 
     	List<com.google.appengine.api.search.Field> fieldsToReturn = new ArrayList<>();

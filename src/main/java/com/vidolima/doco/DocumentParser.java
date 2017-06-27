@@ -161,6 +161,7 @@ final class DocumentParser {
      * @return the  List<{@link com.google.appengine.api.search.Field}>
      * @throws IllegalAccessException
      */
+    @SuppressWarnings("rawtypes")
     private List<com.google.appengine.api.search.Field> getSearchFieldByFieldType(String name, java.lang.reflect.Field field,
         Object obj, FieldType fieldType) throws IllegalAccessException {
 
@@ -172,7 +173,8 @@ final class DocumentParser {
         	//Check if the fieldValue is a Collection
         	//if it is add each item in the Collection as a separate field with the same name but different value
         	if( fieldValue instanceof Collection ){
-        		Collection col = (Collection) fieldValue;
+        		
+				Collection col = (Collection) fieldValue;
         		Iterator colIterator = col.iterator();
         		while( colIterator.hasNext() ){
         			Object text = colIterator.next();

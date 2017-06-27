@@ -175,7 +175,7 @@ final class DocumentParser {
         	if( fieldValue instanceof Collection ){
         		
 				Collection col = (Collection) fieldValue;
-				Iterator colIterator = col.iterator();
+				Iterator colIterator = col.iterator(); 
         		while( colIterator.hasNext() ){
         			Object text = colIterator.next();
         			if( text instanceof String){ // multi-value fields can only be Strings, not Date of Number

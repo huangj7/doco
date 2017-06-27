@@ -3,6 +3,7 @@ package com.vidolima.doco;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -215,8 +216,9 @@ final class DocumentParser {
         	
         	if( fieldValue instanceof Collection ){
         		Collection col = (Collection) fieldValue;
-        		while( col.iterator().hasNext() ){
-        			Object atom = col.iterator().next();
+        		Iterator colIterator = col.iterator();
+        		while( colIterator.hasNext() ){
+        			Object atom = colIterator.next();
         			if( atom instanceof String){ // multi-value fields can only be Strings not Date or Number
         				fieldsToReturn.add( Field.newBuilder().setName(name).setAtom( (String) atom).build() );
         			}

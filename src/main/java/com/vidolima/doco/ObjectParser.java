@@ -135,7 +135,8 @@ final class ObjectParser {
      * @throws IllegalAccessException 
      * @throws InstantiationException 
      */
-    private Object getDocumentFieldValue(Document document, java.lang.reflect.Field field) throws InstantiationException, IllegalAccessException {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	private Object getDocumentFieldValue(Document document, java.lang.reflect.Field field) throws InstantiationException, IllegalAccessException {
     	
         DocumentField annotation = getDocumentFieldAnnotation(field);
         String fieldName = getFieldNameValue(field, annotation); // gets the fieldName from the annotation incase the Search.Field fieldName is not the default java.lang.reflec.Field name

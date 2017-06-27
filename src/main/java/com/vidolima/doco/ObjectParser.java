@@ -132,8 +132,10 @@ final class ObjectParser {
      * @param field
      *            the field to get the value
      * @return the value of the field
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
      */
-    private Object getDocumentFieldValue(Document document, java.lang.reflect.Field field) {
+    private Object getDocumentFieldValue(Document document, java.lang.reflect.Field field) throws InstantiationException, IllegalAccessException {
     	
         DocumentField annotation = getDocumentFieldAnnotation(field);
         String fieldName = getFieldNameValue(field, annotation); // gets the fieldName from the annotation incase the Search.Field fieldName is not the default java.lang.reflec.Field name
@@ -183,7 +185,6 @@ final class ObjectParser {
     	            break;
     	        default:
     	        	throw new IllegalArgumentException("multi-valued field can only be TEXT, ATOM, or HTML, actual type of search field f:" + f.getType() );
-    	        	break;
     	        }
         		
         	}
@@ -191,7 +192,7 @@ final class ObjectParser {
         	return collection;
         }
 
-        throw new IllegalAnnotationDeclarationException("Invalid com.google.appengine.api.search.Field.FieldType: " + f.getType());
+        throw new IllegalAnnotationDeclarationException("Invalid com.google.appengine.api.search.Field.FieldType: ");
     }
 
     /**

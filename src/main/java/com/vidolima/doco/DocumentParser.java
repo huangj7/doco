@@ -147,8 +147,8 @@ final class DocumentParser {
     /**
      * Obtains a List of {@link com.google.appengine.api.search.Field} given a name, value and type.
      * Note by James Huang: Modified to return a list of fields
-     * 						if the field is instanceof Collection.class the List will have more than 1 field,
-     * 						otherwise the List of fields will only have 1 field
+     * 						if the field is instanceof Collection.class the List will have more than 1 field in the return list,
+     * 						otherwise the return List of fields will only have 1 field
      * @param fieldValue
      *            the value to be set to the returned field
      * @param name
@@ -157,7 +157,7 @@ final class DocumentParser {
      *            the {@link java.lang.reflect.Field}
      * @param obj
      *            the object base
-     * @return the {@link com.google.appengine.api.search.Field}
+     * @return the  List<{@link com.google.appengine.api.search.Field}>
      * @throws IllegalAccessException
      */
     private List<com.google.appengine.api.search.Field> getSearchFieldByFieldType(String name, java.lang.reflect.Field field,
@@ -175,7 +175,7 @@ final class DocumentParser {
         		while( col.iterator().hasNext() ){
         			Object text = col.iterator().next();
         			if( text instanceof String){ // multi-value fields can only be Strings, not Date of Number
-        				fieldsToReturn.add( Field.newBuilder().setName(name).setText(text).build() ); // we know text is a String so we can add it to the collection
+        				fieldsToReturn.add( Field.newBuilder().setName(name).setText((String) text).build() ); // we know text is a String so we can add it to the collection
         			}
         			else{
 //        				logger.warn("getSearchFieldByFieldType(), fieldValue is instanceof List but is not List<String>:" + fieldValue );
@@ -198,7 +198,7 @@ final class DocumentParser {
         		while( col.iterator().hasNext() ){
         			Object html = col.iterator().next();
         			if( html instanceof String){ // multi-value fields can only be Strings not Date of Number
-        				fieldsToReturn.add( Field.newBuilder().setName(name).setHTML(html).build() );
+        				fieldsToReturn.add( Field.newBuilder().setName(name).setHTML( (String) html).build() );
         			}
         			else{
 //        				logger.warn("getSearchFieldByFieldType(), fieldValue is instanceof List but is not List<String>:" + fieldValue );
@@ -218,7 +218,7 @@ final class DocumentParser {
         		while( col.iterator().hasNext() ){
         			Object atom = col.iterator().next();
         			if( atom instanceof String){ // multi-value fields can only be Strings not Date or Number
-        				fieldsToReturn.add( Field.newBuilder().setName(name).setAtom(atom).build() );
+        				fieldsToReturn.add( Field.newBuilder().setName(name).setAtom( (String) atom).build() );
         			}
         			else{
 //        				logger.warn("getSearchFieldByFieldType(), fieldValue is instanceof List but is not List<String>:" + fieldValue );
@@ -318,7 +318,7 @@ final class DocumentParser {
 
         List<com.google.appengine.api.search.Field> fields = new ArrayList<com.google.appengine.api.search.Field>();
 
-        for (FieldType type : FieldType.values()) {
+        for (FieldType type : FieldType.values()) { // loops through every FieldType (i.e. TEXT, ATOM, HTML, DATE, NUMBER, GEOPOINT )
             for (com.google.appengine.api.search.Field f : getAllSearchFieldsByType(fieldNamePrefix, obj, classOfObj,
                 type)) {
                 fields.add(f);

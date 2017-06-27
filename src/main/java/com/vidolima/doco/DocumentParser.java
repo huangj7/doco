@@ -23,7 +23,6 @@ import com.vidolima.doco.annotation.FacetField;
 import com.vidolima.doco.annotation.FieldType;
 import com.vidolima.doco.exception.DocumentParseException;
 
-
 /**
  * This class is used to create {@link Document}s instances from Objects.
  * 

@@ -43,7 +43,7 @@ final class DocumentParser {
      */
     private java.lang.reflect.Field getDocumentIdField(Class<?> classOfObj) throws DocumentParseException {
         List<java.lang.reflect.Field> result = ReflectionUtils.getAnnotatedFields(classOfObj, DocumentId.class);
-
+        
         if (result.size() > 1) {
             throw new DocumentParseException("More than one occurrence of @DocumentId found in " + classOfObj);
         }

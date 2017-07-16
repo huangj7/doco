@@ -29,4 +29,5 @@ public @interface DocumentCollection{
      * Specifies the CollectionType of the field
      */
     DocumentCollectionType type() default DocumentCollectionType.ARRAYLIST;
+
 }

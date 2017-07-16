@@ -6,6 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.google.appengine.api.search.Document;
+
 /**
  * Place this annotation on fields of an entity POJO. This annotation defines a field of a {@link Document}.
  * 

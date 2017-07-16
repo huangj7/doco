@@ -321,7 +321,8 @@ final class ObjectParser {
      * @param type is the DocumentCollectionType
      * @return
      */
-    public static Collection getConcreteCollection( DocumentCollectionType type){
+    @SuppressWarnings("rawtypes")
+	public static Collection getConcreteCollection( DocumentCollectionType type){
 //    	ARRAYLIST, LINKEDLIST, VECTOR, STACK, ARRAY_DEQUE, HASHSET, LINKED_HASHSET, TREESET, PRIORITY_QUEUE
     	if( type == DocumentCollectionType.ARRAYLIST){
     		return new ArrayList();

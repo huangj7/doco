@@ -6,31 +6,25 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.google.appengine.api.search.Document;
-
 /**
  * Place this annotation on fields of an entity POJO. This annotation defines a field of a {@link Document}.
  * 
- * @author Marcos Alexandre Vidolin de Lima
- * @since January 22, 2014
+ * @author James Huang
+ * @since July 11, 2017
  */
+
 @Documented
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DocumentField {
-
+public @interface DocumentCollection{
     /**
      * Specifies the name of the field.
-     * 
      * @return name.
      */
     String name() default "";
-
-    /**
-     * Specifies the {@link FieldType} of the field.
-     * 
-     * @return {@link FieldType}.
-     */
-    FieldType type() default FieldType.TEXT;
     
+    /**
+     * Specifies the CollectionType of the field
+     */
+    DocumentCollectionType type() default DocumentCollectionType.ARRAYLIST;
 }

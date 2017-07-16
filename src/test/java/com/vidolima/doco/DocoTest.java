@@ -11,9 +11,13 @@ import com.google.appengine.api.search.Document;
 import com.google.appengine.api.search.Field;
 import com.google.appengine.api.search.GeoPoint;
 
+//import org.apache.log4j.Logger;
+
 @RunWith(JUnit4.class)
 public class DocoTest {
-
+	
+//	private final transient Logger logger = Logger.getLogger(DocoTest.class);
+	
     @Test
     public void testConversionFromDocumentToObject() {
 
@@ -99,6 +103,33 @@ public class DocoTest {
         Bar retrievedBar = doco.fromDocument(document, Bar.class);
         Assert.assertEquals(bar.getCode(), retrievedBar.getCode());
         Assert.assertEquals(bar.getSubClassNumberField(), retrievedBar.getSubClassNumberField());
+    }
+    
+    /**
+     * James Huang Test if the  DocumentCollection works when converting a document back into a java object which uses the DocumentCollection Annotation
+	 * Note: Many fields with the same name in a Document represents a multivalued property and we want to test if we can recognize a multivalued property
+	 * and turn it into the appropriate Collection for the Java Object 
+     */
+    @Test
+    public void testDocummentCollectionAnnotation(){
+    	/**
+    	 * Step 1: Create a document with multi-valued property
+    	 */
+    	Document.Builder doc = Document.newBuilder();
+    	doc.setId("123123123");
+    	//add a collection of fields which is basically many fields with the same name but different values 
+    	for( int i = 0; i < 100; i++){
+    		doc.addField( Field.newBuilder().setName( Foo.ARRAY_LIST_TEST ).setAtom("arrItem" + i));
+    	}
+    	
+    	Document docWithMVP = doc.build();
+    	
+    	Doco doco = new Doco();
+    	Foo f = doco.fromDocument(docWithMVP, Foo.class);
+    	
+//    	TODO: use logger instead of println
+    	System.out.println( f.getArrayListTest() );
+    	Assert.assertNotNull( f.getArrayListTest() );
     }
 
 }

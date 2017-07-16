@@ -1,8 +1,17 @@
 package com.vidolima.doco;
 
 import java.lang.reflect.Field;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Stack;
+import java.util.TreeSet;
+import java.util.Vector;
 
 import com.google.appengine.api.search.Document;
 import com.google.appengine.api.search.Index;
@@ -67,6 +76,26 @@ final class ObjectParser {
         }
         return name;
     }
+    
+    /**
+     * Obtains the name value of the {@link DocumentCollection} annotation of a given {@link Field} or the name of the
+     * {@link Field} by default.
+     * 
+     * @author James Huang
+     * @param field
+     * @param annotation
+     * @return the specified parameter name of the {@link DocumentField} annotation, or if not specified returns the
+     *         name of the field by default
+     */
+    static String getFieldNameValue(java.lang.reflect.Field field, DocumentCollection annotation) {
+        String name = annotation.name();
+        if (name == null || name.trim().length() == 0) {
+            name = field.getName();
+        }
+        return name;
+    }
+    
+    
 
     /**
      * Obtains the {@link FieldType} of the {@link DocumentField} annotation of a given {@link Field}.
@@ -92,6 +121,16 @@ final class ObjectParser {
      */
     static DocumentField getDocumentFieldAnnotation(java.lang.reflect.Field field) {
         return field.getAnnotation(DocumentField.class);
+    }
+    
+    /**
+     * Obtains the {@link DocumentCollection} annotation of a given {@link Field}
+     * @param field
+     *            to get the {@link DocumentCollection} annotation
+     * @return the {@link DocumentCollection} annotation
+     */
+    static DocumentCollection getDocumentCollectionAnnotation( java.lang.reflect.Field field){
+    	return field.getAnnotation(DocumentCollection.class);
     }
 
     /**
@@ -135,8 +174,18 @@ final class ObjectParser {
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	private Object getDocumentFieldValue(Document document, java.lang.reflect.Field field) throws InstantiationException, IllegalAccessException {
     	
-        DocumentField annotation = getDocumentFieldAnnotation(field);
-        String fieldName = getFieldNameValue(field, annotation); // gets the fieldName from the annotation incase the Search.Field fieldName is not the default java.lang.reflec.Field name
+    	//the annotation must be a DocumentField or a DocumentCollection
+        DocumentField annotation = getDocumentFieldAnnotation(field); 
+        DocumentCollection collectionAnnotation = getDocumentCollectionAnnotation( field );
+        
+        String fieldName = null;
+        if( annotation != null){
+        	fieldName = getFieldNameValue(field, annotation);  // gets the fieldName from the annotation incase the Search.Field fieldName is not the default java.lang.reflec.Field name
+        }
+        else{
+        	fieldName = getFieldNameValue(field, collectionAnnotation);
+        }
+        
 
         if (document.getFieldCount(fieldName) == 0)
             return null;
@@ -162,7 +211,7 @@ final class ObjectParser {
         	Object collection = null;
         	
         	if( Collection.class.isAssignableFrom( field.getType() ) ){ //Check if java.lang.reflect.field is a Set or of List
-        		collection = field.getType().newInstance();
+        		collection = getConcreteCollection( collectionAnnotation.type() );
     		}
         	else{
         		throw new IllegalArgumentException("multi-valued field must be of type Collection" ); 
@@ -253,6 +302,11 @@ final class ObjectParser {
 
         // others values
         List<java.lang.reflect.Field> fields = ReflectionUtils.getAnnotatedFields(classOfObj, DocumentField.class);
+        
+        /**
+         *  James Huang Add any collection annotations
+         */
+        fields.addAll( ReflectionUtils.getAnnotatedFields(classOfObj, DocumentCollection.class));
 
         for (java.lang.reflect.Field f : fields) {
             Object value = getDocumentFieldValue(document, f);
@@ -260,6 +314,46 @@ final class ObjectParser {
         }
 
         return instanceOfT;
+    }
+    
+    /**
+     * initializes the concrete collection specified by the DocumentCollectionType Enum
+     * @param type is the DocumentCollectionType
+     * @return
+     */
+    public static Collection getConcreteCollection( DocumentCollectionType type){
+//    	ARRAYLIST, LINKEDLIST, VECTOR, STACK, ARRAY_DEQUE, HASHSET, LINKED_HASHSET, TREESET, PRIORITY_QUEUE
+    	if( type == DocumentCollectionType.ARRAYLIST){
+    		return new ArrayList();
+    	}
+    	else if( type == DocumentCollectionType.LINKEDLIST ){
+    		return new LinkedList();
+    	}
+    	else if( type == DocumentCollectionType.VECTOR ){
+    		return new Vector();
+    	}
+    	else if( type == DocumentCollectionType.STACK ){
+    		return new Stack();
+    	}
+    	else if( type == DocumentCollectionType.ARRAY_DEQUE ){
+    		return new ArrayDeque();
+    	}
+		else if( type == DocumentCollectionType.HASHSET ){
+			return new HashSet();
+		}
+		else if( type == DocumentCollectionType.LINKED_HASHSET ){
+			return new LinkedHashSet();
+		}
+		else if( type == DocumentCollectionType.TREESET ){
+			return new TreeSet();
+		}
+		else if( type == DocumentCollectionType.PRIORITY_QUEUE ){
+			return new PriorityQueue();
+		}
+    	else{
+    		throw new IllegalArgumentException(" INVALID DocumentCollectionType: " + type);
+    	}
+    	
     }
 
 }

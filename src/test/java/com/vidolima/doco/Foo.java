@@ -1,8 +1,12 @@
 package com.vidolima.doco;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.google.appengine.api.search.GeoPoint;
+import com.vidolima.doco.annotation.DocumentCollection;
+import com.vidolima.doco.annotation.DocumentCollectionType;
 import com.vidolima.doco.annotation.DocumentField;
 import com.vidolima.doco.annotation.DocumentId;
 import com.vidolima.doco.annotation.DocumentIndex;
@@ -11,6 +15,8 @@ import com.vidolima.doco.annotation.FieldType;
 @DocumentIndex
 class Foo {
 
+	public static final String ARRAY_LIST_TEST = "arrayListTest";
+	
 	@DocumentId
 	private Integer code;
 
@@ -40,6 +46,34 @@ class Foo {
 
 	@DocumentField(type = FieldType.GEO_POINT)
 	private GeoPoint geopointFieldTest;
+
+	/**
+	 * James test @DocumentCollectionType
+	 */
+	@DocumentCollection( type = DocumentCollectionType.ARRAYLIST)
+	private List<Object> arrayListTest;
+	
+	public void addToArrayListTest( Object obj ){
+		if ( arrayListTest == null){
+			arrayListTest = new ArrayList();
+		}
+		arrayListTest.add(obj);
+	}
+	
+	public void removeFromArrayListTest( Object obj ){
+		if ( arrayListTest == null){
+			arrayListTest = new ArrayList();
+		}
+		arrayListTest.remove(obj);
+	}
+	
+	public List<Object> getArrayListTest() {
+		return arrayListTest;
+	}
+	
+	public void setArrayListTest(List<Object> arrayListTest) {
+		this.arrayListTest = arrayListTest;
+	}
 
 	public Integer getCode() {
 		return code;

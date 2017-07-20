@@ -178,6 +178,10 @@ final class ObjectParser {
         DocumentField annotation = getDocumentFieldAnnotation(field); 
         DocumentCollection collectionAnnotation = getDocumentCollectionAnnotation( field );
         
+        if(annotation == null && collectionAnnotation == null ){
+            throw new IllegalAnnotationDeclarationException("Invalid com.google.appengine.api.search.Field.FieldType: ");
+        }
+        	
         String fieldName = null;
         if( annotation != null){
         	fieldName = getFieldNameValue(field, annotation);  // gets the fieldName from the annotation incase the Search.Field fieldName is not the default java.lang.reflec.Field name
@@ -187,9 +191,10 @@ final class ObjectParser {
         }
         
 
+
         if (document.getFieldCount(fieldName) == 0)
             return null;
-        else if( document.getFieldCount(fieldName) == 1){
+        else if( document.getFieldCount(fieldName) == 1 && annotation !=null && collectionAnnotation == null){ //only 1 field and uses @DocumentField and doesn't use @DocumentCollection
 	        com.google.appengine.api.search.Field f = document.getOnlyField(fieldName); // if we want to support multi-valued field 
 	
 	        switch (f.getType()) {
@@ -207,7 +212,7 @@ final class ObjectParser {
 	            return f.getGeoPoint();
 	        }
         }
-        else if( document.getFieldCount(fieldName) > 1){ //if it is a multi-valued field
+        else if( document.getFieldCount(fieldName) > 1 && annotation == null && collectionAnnotation != null){ //if it is a multi-valued field and uses @DocumentCollection and not @DocumentField
         	Object collection = null;
         	
         	if( Collection.class.isAssignableFrom( field.getType() ) ){ //Check if java.lang.reflect.field is a Set or of List
@@ -238,8 +243,9 @@ final class ObjectParser {
         	
         	return collection;
         }
+        //else return null
+		return null;
 
-        throw new IllegalAnnotationDeclarationException("Invalid com.google.appengine.api.search.Field.FieldType: ");
     }
 
     /**

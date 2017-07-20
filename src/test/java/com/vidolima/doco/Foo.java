@@ -50,7 +50,7 @@ class Foo {
 	/**
 	 * James test @DocumentCollectionType
 	 */
-	@DocumentCollection( type = DocumentCollectionType.ARRAYLIST)
+	@DocumentCollection( type = DocumentCollectionType.ARRAYLIST, fieldType = FieldType.ATOM)
 	private List<Object> arrayListTest;
 	
 	public void addToArrayListTest( Object obj ){

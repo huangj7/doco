@@ -15,6 +15,7 @@ import com.google.appengine.api.search.Field;
 import com.google.appengine.api.search.GeoPoint;
 import com.google.common.base.Strings;
 import com.googlecode.objectify.Ref;
+import com.vidolima.doco.annotation.DocumentCollection;
 import com.vidolima.doco.annotation.DocumentEmbed;
 import com.vidolima.doco.annotation.DocumentField;
 import com.vidolima.doco.annotation.DocumentId;
@@ -76,6 +77,14 @@ final class DocumentParser {
 
     List<java.lang.reflect.Field> getAllFacetFields(Class<?> classOfObj) {
         return ReflectionUtils.getAnnotatedFields(classOfObj, FacetField.class);
+    }
+    
+    /**
+     * Obtains all the {@link java.lang.reflect.Field}s annotated with {@link DocumentCollection}
+     * @author James Huang
+     */
+    List<java.lang.reflect.Field> getAllDocumentCollection(Class<?> classOfObj){
+    	return ReflectionUtils.getAnnotatedFields(classOfObj, DocumentCollection.class);
     }
 
     /**
@@ -147,7 +156,7 @@ final class DocumentParser {
 
     /**
      * Obtains a List of {@link com.google.appengine.api.search.Field} given a name, value and type.
-     * Note by James Huang: Modified to return a list of fields
+     * Note by James Huang: Modified to return a list of fields if using @DocumentCollection annotation
      * 						if the field is instanceof Collection.class the List will have more than 1 field in the return list,
      * 						otherwise the return List of fields will only have 1 field
      * @param fieldValue
@@ -271,7 +280,7 @@ final class DocumentParser {
 
     /**
      * Obtains a list of {@link com.google.appengine.api.search.Field} from {@link FieldType}.
-     * 
+     * NOTE: James Huang Modified to also check for all {@link DocumentCollections}
      * @param obj
      *            the object base
      * @param classOfObj
@@ -285,16 +294,17 @@ final class DocumentParser {
 
         List<com.google.appengine.api.search.Field> fields = new ArrayList<Field>(0);
 
-        for (java.lang.reflect.Field f : getAllDocumentField(classOfObj)) {
-
+        for (java.lang.reflect.Field f : getAllDocumentField(classOfObj)) { //iterate through every @DocumentField
+        	
             // TODO: validate field (declaration of annotation)
             DocumentField annotation = ObjectParser.getDocumentFieldAnnotation(f);
 
-            if (annotation.type().equals(fieldType)) {
+            if (annotation.type().equals(fieldType)) { //check if the type is the FieldType we are looking for
                 String name = ObjectParser.getFieldNameValue(f, annotation);
                 String fullName = Strings.isNullOrEmpty(fieldNamePrefix) ? name : fieldNamePrefix + "_" + name;
                 //Gets all the Search Fields from the object field
                 //if the object field is a Collection(i.e. a List) we have to store it as a multi-valued field
+                //TODO: A DocumentCollection is no longer a DocumentField but its own annotation. Maybe check if we can delete some of this code
                 List<com.google.appengine.api.search.Field> searchFields = getSearchFieldByFieldType(fullName, f, obj, fieldType);
                 for( com.google.appengine.api.search.Field field: searchFields){
                 	if (field != null) {
@@ -303,6 +313,25 @@ final class DocumentParser {
                 }
                 
             }
+        }
+        
+        /**
+         * James Huang
+         */
+        for( java.lang.reflect.Field f: getAllDocumentCollection(classOfObj)){ // iterate through every @DocumentCollection
+        	DocumentCollection annotation = ObjectParser.getDocumentCollectionAnnotation(f);
+        	if( annotation.fieldType().equals(fieldType) ) { // check if it is the FieldType we are looking for
+        		String name = ObjectParser.getFieldNameValue(f, annotation);
+        		String fullName = Strings.isNullOrEmpty(fieldNamePrefix) ? name : fieldNamePrefix + "_" + name;
+        		
+        		List<com.google.appengine.api.search.Field> searchFields = getSearchFieldByFieldType(fullName, f, obj, fieldType);
+        		for( com.google.appengine.api.search.Field field: searchFields){
+                	if (field != null) {
+                        fields.add(field);
+                    }
+                }
+        		
+        	}
         }
 
         return fields;
@@ -402,7 +431,7 @@ final class DocumentParser {
      *            prefix for field names if any. Normally this should be set to empty string or null. When supplied,
      *            name of field becomes <b>prefix_</b>fieldName
      * @param obj
-     *            object whcih should be used to get value of document fields.
+     *            object which should be used to get value of document fields.
      * @param classOfObj
      *            class of 'obj' parameter
      * @return All possible fields which are to be added to the search document including fields of Ref entity.

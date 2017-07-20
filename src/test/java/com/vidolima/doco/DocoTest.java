@@ -111,7 +111,7 @@ public class DocoTest {
 	 * and turn it into the appropriate Collection for the Java Object 
      */
     @Test
-    public void testDocummentCollectionAnnotation(){
+    public void testDocummentCollectionAnnotationFromDoc(){
     	/**
     	 * Step 1: Create a document with multi-valued property
     	 */
@@ -130,6 +130,33 @@ public class DocoTest {
 //    	TODO: use logger instead of println
     	System.out.println( f.getArrayListTest() );
     	Assert.assertNotNull( f.getArrayListTest() );
+    }
+    
+    @Test
+    public void testDocumentCollectionToAndFromDoc(){
+    	/**
+    	 * Step 1: Create a Foo  with a list
+    	 */
+    	Foo foo = new Foo(); 
+    	foo.setCode(111); // set the id
+    	for( int i = 0; i< 100; i++){
+    		foo.addToArrayListTest("fooList"+ i); // set the list property
+    	}
+    	
+    	
+    	/**
+    	 * Step 2: Convert it to a Document
+    	 */
+    	Doco doco = new Doco();
+    	Document document = doco.toDocument(foo);
+    	
+    	/**
+    	 * Step 3: Convert it back into Foo
+    	 */
+    	Foo foo2 = doco.fromDocument(document, Foo.class);
+    	Assert.assertNotNull( foo2 );
+    	Assert.assertNotNull( foo2.getArrayListTest() );
+    	
     }
 
 }

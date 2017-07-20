@@ -28,6 +28,12 @@ public @interface DocumentCollection{
     /**
      * Specifies the CollectionType of the field
      */
-    DocumentCollectionType type() default DocumentCollectionType.ARRAYLIST;
+    DocumentCollectionType type() default DocumentCollectionType.ARRAYLIST; // collectionType
 
+    /**
+     * Specifies the {@link FieldType} of the field.
+     * 
+     * @return {@link FieldType}.
+     */
+    FieldType fieldType() default FieldType.TEXT;
 }

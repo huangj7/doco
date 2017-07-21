@@ -35,5 +35,5 @@ public @interface DocumentCollection{
      * 
      * @return {@link FieldType}.
      */
-    FieldType fieldType() default FieldType.TEXT;
+    FieldType fieldType() default FieldType.TEXT; // DocumentCollection and DocumentCollectionType not being recognized for some reason.
 }

@@ -53,6 +53,7 @@ class Foo {
 	@DocumentCollection( type = DocumentCollectionType.ARRAYLIST, fieldType = FieldType.ATOM)
 	private List<Object> arrayListTest;
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void addToArrayListTest( Object obj ){
 		if ( arrayListTest == null){
 			arrayListTest = new ArrayList();
@@ -60,6 +61,7 @@ class Foo {
 		arrayListTest.add(obj);
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void removeFromArrayListTest( Object obj ){
 		if ( arrayListTest == null){
 			arrayListTest = new ArrayList();

@@ -123,6 +123,7 @@ public class DocoTest {
     	}
     	
     	Document docWithMVP = doc.build();
+    	//please work
     	
     	Doco doco = new Doco();
     	Foo f = doco.fromDocument(docWithMVP, Foo.class);

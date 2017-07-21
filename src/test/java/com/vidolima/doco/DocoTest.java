@@ -143,6 +143,7 @@ public class DocoTest {
     		foo.addToArrayListTest("fooList"+ i); // set the list property
     	}
     	
+  
     	
     	/**
     	 * Step 2: Convert it to a Document

@@ -212,7 +212,7 @@ final class ObjectParser {
 	            return f.getGeoPoint();
 	        }
         }
-        else if( document.getFieldCount(fieldName) > 1 && annotation == null && collectionAnnotation != null){ //if it is a multi-valued field and uses @DocumentCollection and not @DocumentField
+        else if( document.getFieldCount(fieldName) >= 1 && annotation == null && collectionAnnotation != null){ //if it is a multi-valued field and uses @DocumentCollection and not @DocumentField
         	Object collection = null;
         	
         	if( Collection.class.isAssignableFrom( field.getType() ) ){ //Check if java.lang.reflect.field is a Set or of List

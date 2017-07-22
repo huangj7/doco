@@ -14,6 +14,8 @@ import com.google.appengine.api.search.Facet;
 import com.google.appengine.api.search.Field;
 import com.google.appengine.api.search.GeoPoint;
 import com.google.common.base.Strings;
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.Ref;
 import com.vidolima.doco.annotation.DocumentCollection;
 import com.vidolima.doco.annotation.DocumentEmbed;
@@ -33,7 +35,9 @@ import com.vidolima.doco.exception.DocumentParseException;
 final class DocumentParser {
 
     private static final String DEFAULT_FIELD_NAME_PREFIX = "";
-
+    
+    private ObjectifyFactory objectifyFactory = new ObjectifyFactory();
+    
     /**
      * Obtains the {@link java.lang.reflect.Field} annotated with {@link DocumentId} annotation.
      * 
@@ -106,7 +110,18 @@ final class DocumentParser {
         T id = (T) ReflectionUtils.getFieldValue(field, obj, classOfT);
 
         if (id == null) {
-            throw new DocumentParseException("No id was set to \"" + field.getName() + "\" field in " + classOfObj);
+        	//if fieldType is Long auto generate and Id
+        	Key<?> autoId = objectifyFactory.allocateId(classOfObj);
+        	if(field.getType().isAssignableFrom(String.class)){ // check if field type is Long or String
+        		id = (T) (autoId.getId() + "");
+        	}
+        	else if(field.getType().isAssignableFrom(Long.class) ){
+        		id = (T) new Long( autoId.getId());
+        	}
+        	else{
+        		throw new DocumentParseException("No id was set to \"" + field.getName() + "\" field in " + classOfObj + ", and could not autoGenerate because ID Field type is not String or Long"); 
+        	}
+            
         }
 
         return id;

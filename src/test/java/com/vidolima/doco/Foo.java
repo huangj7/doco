@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.google.appengine.api.search.GeoPoint;
+import com.googlecode.objectify.annotation.Entity;
 import com.vidolima.doco.annotation.DocumentCollection;
 import com.vidolima.doco.annotation.DocumentCollectionType;
 import com.vidolima.doco.annotation.DocumentField;
@@ -13,6 +14,7 @@ import com.vidolima.doco.annotation.DocumentIndex;
 import com.vidolima.doco.annotation.FieldType;
 
 @DocumentIndex
+@Entity
 class Foo {
 
 	public static final String ARRAY_LIST_TEST = "arrayListTest";

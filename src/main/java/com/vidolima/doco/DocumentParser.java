@@ -396,7 +396,11 @@ final class DocumentParser {
         String id = documentId;
         if (id == null) {
             java.lang.reflect.Field field = getDocumentIdField(classOfObj);
-            id = String.valueOf(getId(obj, classOfObj, field.getType()));
+            Object gottenId = getId(obj, classOfObj, field.getType());
+            if( gottenId != null){
+            	id = String.valueOf(gottenId);
+            } // we want to all the id to be null if it was not specified in the obj so Search API can autoassign the doc_id
+            
         }
 
         Document.Builder builder = Document.newBuilder().setId(id);

@@ -109,20 +109,20 @@ final class DocumentParser {
         java.lang.reflect.Field field = getDocumentIdField(classOfObj);
         T id = (T) ReflectionUtils.getFieldValue(field, obj, classOfT);
 
-        if (id == null) {
-        	//if fieldType is Long auto generate and Id
-        	Key<?> autoId = objectifyFactory.allocateId(classOfObj);
-        	if(field.getType().isAssignableFrom(String.class)){ // check if field type is Long or String
-        		id = (T) (autoId.getId() + "");
-        	}
-        	else if(field.getType().isAssignableFrom(Long.class) ){
-        		id = (T) new Long( autoId.getId());
-        	}
-        	else{
-        		throw new DocumentParseException("No id was set to \"" + field.getName() + "\" field in " + classOfObj + ", and could not autoGenerate because ID Field type is not String or Long"); 
-        	}
-            
-        }
+//        if (id == null) {
+//        	//if fieldType is Long auto generate and Id
+//        	Key<?> autoId = objectifyFactory.allocateId(classOfObj);
+//        	if(field.getType().isAssignableFrom(String.class)){ // check if field type is Long or String
+//        		id = (T) (autoId.getId() + "");
+//        	}
+//        	else if(field.getType().isAssignableFrom(Long.class) ){
+//        		id = (T) new Long( autoId.getId());
+//        	}
+//        	else{
+//        		throw new DocumentParseException("No id was set to \"" + field.getName() + "\" field in " + classOfObj + ", and could not autoGenerate because ID Field type is not String or Long"); 
+//        	}
+//            
+//        }
 
         return id;
     }

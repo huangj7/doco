@@ -316,7 +316,20 @@ final class ObjectParser {
 
         for (java.lang.reflect.Field f : fields) {
             Object value = getDocumentFieldValue(document, f);
-            f.set(instanceOfT, value);
+            //Check that if Field f is an enum to use the enum.valueof Method()
+            if( f.getType().isEnum() ){
+            	if( value instanceof String){
+            		f.set(instanceOfT, Enum.valueOf( (Class<Enum>) f.getType() , (String) value) );
+            	}
+            	else{
+            		throw new IllegalArgumentException("Doco parseObject() ERROR field f is enum but value is not string, f.getType().isEnum()[" + f.getType().isEnum() +  "]" + ", value.getClass()[" + value.getClass() + "]");
+            	}
+            	
+            }
+            else{
+            	f.set(instanceOfT, value);
+            }
+            
         }
 
         return instanceOfT;

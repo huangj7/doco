@@ -298,7 +298,8 @@ final class ObjectParser {
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    <T> T parseObject(Document document, Class<T> classOfObj) throws InstantiationException, IllegalAccessException {
+    @SuppressWarnings("unchecked")
+	<T> T parseObject(Document document, Class<T> classOfObj) throws InstantiationException, IllegalAccessException {
 
         T instanceOfT = classOfObj.newInstance();
 
@@ -317,9 +318,12 @@ final class ObjectParser {
         for (java.lang.reflect.Field f : fields) {
             Object value = getDocumentFieldValue(document, f);
             //Check that if Field f is an enum to use the enum.valueof Method
-            System.out.println("value:[" + value + "]" + ", f.getType().isEnum():[" + f.getType().isEnum() + "]" 
-            				+ ", (String) value:[" + (String) value + "]" 
-            				+ ", Enum.valueOf( (Class<Enum>) f.getType() , (String) value)[" + Enum.valueOf( (Class<Enum>) f.getType() , (String) value) );
+            System.out.println("value:[" + value + "]");
+            System.out.println("f.getType():[" + f.getType() + "]");
+            System.out.println("f.getType().isEnum():[" + f.getType().isEnum() + "]" );
+            System.out.println("(String) value:[" + (String) value + "]");
+            System.out.println("Enum.valueOf( (Class<Enum>) f.getType() , (String) value)[" + Enum.valueOf( (Class<Enum>) f.getType() , (String) value));
+            				
             if( value != null && f.getType().isEnum()  ){ // if value == null there is no need to convert the value to an enum
             	if( value instanceof String){ 
             		if( value.equals("null")){ // "null" edge case

@@ -322,14 +322,15 @@ final class ObjectParser {
             System.out.println("f.getType():[" + f.getType() + "]");
             System.out.println("f.getType().isEnum():[" + f.getType().isEnum() + "]" );
             System.out.println("(String) value:[" + (String) value + "]");
-            System.out.println("Enum.valueOf( (Class<Enum>) f.getType() , (String) value)[" + Enum.valueOf( (Class<Enum>) f.getType() , (String) value));
             				
             if( value != null && f.getType().isEnum()  ){ // if value == null there is no need to convert the value to an enum
+            	
             	if( value instanceof String){ 
             		if( value.equals("null")){ // "null" edge case
             			f.set(instanceOfT, null); // set the field to null
             		}
             		else{
+            			System.out.println("Enum.valueOf( (Class<Enum>) f.getType() , (String) value)[" + Enum.valueOf( (Class<Enum>) f.getType() , (String) value));
             			f.set(instanceOfT, Enum.valueOf( (Class<Enum>) f.getType() , (String) value) );
             		}
             		

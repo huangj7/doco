@@ -111,7 +111,8 @@ public class DocoTest {
      * 
      * Timeout is necessary so that infinite loop can be detected.
      */
-    @Test(timeout = 2000)
+//    @Test(timeout = 2000)
+    @Test
     public void testCreateDocumentForSubclass() {
         Bar bar = new Bar();
         bar.setCode(10); // set id
@@ -182,7 +183,29 @@ public class DocoTest {
     	
     }
 
-    
+    @Test
+    public void testEnumConversionForObjectParser(){
+    	/**
+    	 * Step 1: Create a Foo();
+    	 */
+    	Foo f = new Foo();
+    	f.setCode(111); // set the id
+    	f.setFooEnumTest(FooEnumTest.FOO_ONE); // set fooEnumTest 
+    	
+    	/**
+    	 * Step 2: Convert it to a Document
+    	 */
+    	Doco doco = new Doco();
+    	Document doc = doco.toDocument(f); 
+    	
+    	/**
+    	 * Step 3: Convert it back into Foo
+    	 */
+    	
+    	Foo f2 = doco.fromDocument(doc, Foo.class);
+    	Assert.assertEquals( f2.getFooEnumTest(), f.getFooEnumTest());
+    	
+    }
 
     
 }

@@ -213,6 +213,11 @@ final class DocumentParser {
         		}
         	}
         	else{
+//        		String text = null;
+//        		if( fieldValue != null){
+//        			String.valueOf(fieldValue); // if fieldValue is not null then set the TEXT value other wise set null for the value of the field
+//        		}
+        		
         		String text = String.valueOf(fieldValue);
         		fieldsToReturn.add( Field.newBuilder().setName(name).setText(text).build() );
         	}
@@ -236,7 +241,11 @@ final class DocumentParser {
         		}
         	}
         	else{
-	            String html = String.valueOf(fieldValue);
+//        		String html = null;
+//        		if( fieldValue != null){
+//        			html = String.valueOf(fieldValue); // if fieldValue is not null then  set the HTML value other wise set null for the value of the field
+//        		}
+        		String html = String.valueOf(fieldValue);
 	            fieldsToReturn.add( Field.newBuilder().setName(name).setHTML(html).build() );
         	}
         }
@@ -258,6 +267,11 @@ final class DocumentParser {
         		}
         	}
         	else{
+//        		String atom = null;
+//        		if( fieldValue != null){
+//        			atom = String.valueOf(fieldValue); // if fieldValue is not null then  set the ATOM value other wise set null for the value of the field
+//        		}
+        		
         		String atom = String.valueOf(fieldValue);
         		fieldsToReturn.add( Field.newBuilder().setName(name).setAtom(atom).build() );
         	}

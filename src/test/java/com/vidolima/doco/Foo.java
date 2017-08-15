@@ -55,6 +55,21 @@ class Foo {
 	@DocumentCollection( type = DocumentCollectionType.ARRAYLIST, fieldType = FieldType.ATOM)
 	private List<Object> arrayListTest;
 	
+	/**
+	 * James test Enum conversion for Object parser
+	 */
+	@DocumentField(type = FieldType.ATOM)
+	private FooEnumTest fooEnumTest;
+	
+	
+	public FooEnumTest getFooEnumTest() {
+		return fooEnumTest;
+	}
+
+	public void setFooEnumTest(FooEnumTest fooEnumTest) {
+		this.fooEnumTest = fooEnumTest;
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void addToArrayListTest( Object obj ){
 		if ( arrayListTest == null){
